@@ -11,12 +11,12 @@ public class DaySchedule
     /**
      * Поле, содержащее день, который описывается.
      */
-    private final Days day;
+    public final Days day;
 
     /**
      * Поле, содержащее пары, проводимые в этот день.
      */
-    private final ArrayList<Lesson> dayLessons;
+    public final ArrayList<Lesson> lessons;
 
     /**
      * Конструктор класса.
@@ -27,7 +27,7 @@ public class DaySchedule
     public DaySchedule(Days day, ArrayList<Lesson> lessons)
     {
         this.day = day;
-        dayLessons = lessons;
+        this.lessons = lessons;
     }
 }
 

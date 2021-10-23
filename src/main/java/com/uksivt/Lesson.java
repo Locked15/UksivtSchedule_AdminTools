@@ -21,6 +21,11 @@ public class Lesson
     private final String teacher;
 
     /**
+     * Внутреннее поле, содержащее название кабинета, где будет пара.
+     */
+    private final String place;
+
+    /**
      * Метод для получения значения поля "name".
      *
      * @return Значение поля "name".
@@ -51,16 +56,27 @@ public class Lesson
     }
 
     /**
+     * Метод для получения значения поля "place".
+     *
+     * @return Значение поля "place".
+     */
+    public String getPlace()
+    {
+        return place;
+    }
+
+    /**
      * Конструктор класса.
      *
      * @param number Номер пары.
      * @param name Название предмета.
      * @param teacher Преподаватель.
      */
-    public Lesson(Integer number, String name, String teacher)
+    public Lesson(Integer number, String name, String teacher, String place)
     {
         this.number = number;
         this.name = name;
         this.teacher = teacher;
+        this.place = place;
     }
 }
