@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.NoSuchElementException;
 
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
@@ -112,24 +113,175 @@ public class DataReader
      *
      * @return Расписание на неделю для указанной группы.
      *
-     * @exception GroupDoesNotExistException — При отсутствии указанной группы в расписании.
+     * @exception GroupDoesNotExistException Ошибка, возникающая при отсутствии указанной группы в расписании.
+     * @exception NullPointerException Ошибка выполнения связанная с указанием на "null".
      */
-    public ArrayList<DaySchedule> getWeekSchedule(String groupName) throws GroupDoesNotExistException
+    public WeekSchedule getWeekSchedule(String groupName) throws NullPointerException, GroupDoesNotExistException
     {
+        WeekSchedule toReturn;
         Sheet currentSheet = searchTargetSheet(groupName);
 
         if (currentSheet != null)
         {
-            //TODO: Реализовать получение нужных данных.
-            ArrayList<TargetColumnBorders> indices = searchTargetColumns(currentSheet, groupName);
+            //region Подобласть: Прочие переменные.
+            Integer lessonNumber = 0;
+            Integer firstCycleIterator = 0;
+            Days currentDay = null;
+            //endregion
 
-            return null;
+            //region Подобласть: Списки с расписаниями.
+            ArrayList<Lesson> lessons;
+            ArrayList<DaySchedule> schedules = new ArrayList<>(6);
+            //endregion
+
+            //region Подобласть: Итераторы и переменные итераторов.
+            Integer i;
+            Integer column;
+            Iterator<Row> rows;
+            //endregion
+
+            //region Подобласть: Списки с координатами.
+            ArrayList<TargetColumnBorders> indices = searchTargetColumns(currentSheet, groupName);
+            ArrayList<DayColumnCoordinates> daysIndices = searchDaysCoordinates(currentSheet);
+            //endregion
+
+            //region Подобласть: Переменные считывания пар.
+            Lesson currentLesson;
+            Boolean lessonPlaceAdded = false;
+            Boolean lessonNameIsAdded = false;
+            //endregion
+
+            for (column = 0; column < 2; column++)
+            {
+                //Определяем (в первой итерации) и сбрасываем (во второй), ...
+                //... значения переменных:
+                i = 0;
+                rows = currentSheet.rowIterator();
+                currentLesson = new Lesson();
+                lessons = new ArrayList<>(6);
+
+                while (rows.hasNext())
+                {
+                    Row currentRow = rows.next();
+                    Iterator<Cell> cells = currentRow.cellIterator();
+
+                    if (currentRow.getRowNum() < daysIndices.get(0).Coordinates.getRow())
+                    {
+                        continue;
+                    }
+
+                    if (currentRow.getRowNum() == DayColumnCoordinates.getAddressByDay(Days.getValueByIndex(i), daysIndices).getRow())
+                    {
+                        if (i > 0)
+                        {
+                            //Добавляем последнюю пару:
+                            lessons.add(currentLesson);
+
+                            //Добавляем получение расписание на день в список, ...
+                            //... после чего очищаем список с парами на день:
+                            schedules.add(new DaySchedule(currentDay, lessons));
+                            lessons = new ArrayList<>();
+                        }
+
+                        currentLesson = new Lesson();
+                        currentDay = Days.getValueByIndex(i + column * 3);
+                        firstCycleIterator = 0;
+                        lessonNumber = 0;
+
+                        currentLesson.setNumber(lessonNumber);
+
+                        i++;
+                    }
+
+                    if (firstCycleIterator != 0 && firstCycleIterator % 4 == 0)
+                    {
+                        lessons.add(currentLesson);
+
+                        lessonNumber++;
+
+                        lessonPlaceAdded = false;
+                        lessonNameIsAdded = false;
+                        currentLesson = new Lesson();
+                        currentLesson.setNumber(lessonNumber);
+                    }
+
+                    while (cells.hasNext())
+                    {
+                        Cell currentCell = cells.next();
+
+                        if (indices.get(column).LeftBorderIndex >= currentCell.getColumnIndex())
+                        {
+                            continue;
+                        }
+
+                        else if (indices.get(column).RightBorderIndex <= currentCell.getColumnIndex())
+                        {
+                            break;
+                        }
+
+                        //В оригинальном документе кабинеты могут быть указаны в разных ячейках, ...
+                        //... к примеру, на одной строке с преподавателем ИЛИ с названием предмета.
+                        try
+                        {
+                            String cellValue = currentCell.getStringCellValue();
+
+                            if (!cellValue.equals(EMPTY_CELL_VALUE) && !cellValue.equals(UNITED_CELL_VALUE))
+                            {
+                                if (currentCell.getColumnIndex() + 1 == indices.get(column).RightBorderIndex)
+                                {
+                                    //Однако место проведения пары может быть нестандартным, ...
+                                    //... к примеру, "321А" и тогда тип будет уже строковым.
+                                    currentLesson.setPlace(cellValue);
+
+                                    lessonPlaceAdded = true;
+                                }
+
+                                else if (lessonNameIsAdded)
+                                {
+                                    currentLesson.setTeacher(cellValue);
+                                }
+
+                                else
+                                {
+                                    currentLesson.setName(cellValue);
+
+                                    lessonNameIsAdded = true;
+                                }
+                            }
+                        }
+
+                        //Так как кабинет - числовой тип, мы обязаны обработать исключение, ...
+                        //... ведь остальные ячейки имеют строковый тип.
+                        catch (IllegalStateException exception)
+                        {
+                            //Я не уверен, но на всякий случай добавлена такая проверка:
+                            if (!lessonPlaceAdded)
+                            {
+                                Integer temp = ((int) currentCell.getNumericCellValue());
+                                String cellCabinetNumber = temp.toString();
+
+                                currentLesson.setPlace(cellCabinetNumber);
+                            }
+                        }
+                    }
+
+                    firstCycleIterator++;
+                }
+
+                //Вручную добавляем последнюю пару, а затем и день:
+                lessons.add(currentLesson);
+                schedules.add(new DaySchedule(currentDay, lessons));
+            }
+
+            toReturn = new WeekSchedule(groupName, schedules);
         }
 
         else
         {
             throw new GroupDoesNotExistException("Указанная группа не найдена.");
         }
+
+        return toReturn;
     }
 
     /**
@@ -172,8 +324,10 @@ public class DataReader
      * @param groupName Имя группы для поиска соответствующих колонн.
      *
      * @return Список с индексами нужных колонн.
+     *
+     * @throws NullPointerException Ошибка выполнения связанная с указанием на "null".
      */
-    private ArrayList<TargetColumnBorders> searchTargetColumns(Sheet sheet, String groupName)
+    private ArrayList<TargetColumnBorders> searchTargetColumns(Sheet sheet, String groupName) throws NullPointerException
     {
         Cell previousCell;
         Integer i = 0;
@@ -204,7 +358,13 @@ public class DataReader
             if (value.equals(groupName.toLowerCase(Locale.ROOT)))
             {
                 indices.add(new TargetColumnBorders());
-                indices.get(i).leftBorderIndex = previousCell.getColumnIndex();
+
+                if (previousCell == null)
+                {
+                    throw new NullPointerException("Неопознанная ошибка.\n\"PreviousCell\" был \"null\".");
+                }
+
+                indices.get(i).LeftBorderIndex = previousCell.getColumnIndex();
 
                 listen = true;
             }
@@ -212,7 +372,7 @@ public class DataReader
             else if (listen && (currentCell.getCellStyle().getWrapText() ||
             (!value.equals(UNITED_CELL_VALUE) && !value.equals(EMPTY_CELL_VALUE))))
             {
-                indices.get(i).rightBorderIndex = currentCell.getColumnIndex();
+                indices.get(i).RightBorderIndex = currentCell.getColumnIndex();
 
                 listen = false;
                 i++;
@@ -220,16 +380,67 @@ public class DataReader
         }
 
         //Скорее всего, цикл закончится до того, как мы пропишем последнее значение:
-        if (indices.get(indices.size() - 1).rightBorderIndex == null)
+        if (indices.get(indices.size() - 1).RightBorderIndex == null)
         {
             //Очередное доказательство того, что "Integer" и "int" — это не одно и то же.
-            indices.get(indices.size() - 1).rightBorderIndex = (Integer)(int)header.getLastCellNum();
+            indices.get(indices.size() - 1).RightBorderIndex = (Integer)(int)header.getLastCellNum();
         }
 
         return indices;
     }
+
+    /**
+     * Метод, нужный для получения координат ячеек с днями.
+     *
+     * @param sheet Страница для сканирования.
+     *
+     * @return Список с координатами ячеек дней.
+     */
+    private ArrayList<DayColumnCoordinates> searchDaysCoordinates(Sheet sheet)
+    {
+        Iterator<Row> rows = sheet.rowIterator();
+        ArrayList<DayColumnCoordinates> toReturn = new ArrayList<>(1);
+
+        while (rows.hasNext())
+        {
+            Row currentRow = rows.next();
+            Iterator<Cell> cells = currentRow.cellIterator();
+
+            while (cells.hasNext())
+            {
+                String value;
+                Days parsedValue;
+                Cell currentCell = cells.next();
+
+                //Мы проходим по всем ячейкам. Однако некоторые из них не строковые.
+                try
+                {
+                    value = currentCell.getStringCellValue();
+                    parsedValue = Days.fromString(value);
+                }
+
+                //Получение строки из НЕ-строковой ячейки вызовет исключение.
+                //Мы его перехватываем.
+                catch (IllegalStateException exception)
+                {
+                    continue;
+                }
+
+                if (parsedValue != null)
+                {
+                    toReturn.add(new DayColumnCoordinates(currentCell.getAddress().getColumn(),
+                    currentCell.getAddress().getRow(), parsedValue));
+                }
+            }
+        }
+
+        return toReturn;
+    }
 }
 
+/**
+ * Класс, представляющий логику для границ таргетированной колонны.
+ */
 class TargetColumnBorders
 {
     /**
@@ -237,14 +448,14 @@ class TargetColumnBorders
      *
      * Индекс границы является индексом границы другого столбца, примыкающего к таргетированному.
      */
-    public Integer leftBorderIndex;
+    public Integer LeftBorderIndex;
 
     /**
      * Поле, содержащее индекс правой границы столбца.
      *
      * Индекс границы является индексом границы другого столбца, примыкающего к таргетированному.
      */
-    public Integer rightBorderIndex;
+    public Integer RightBorderIndex;
 
     /**
      * Конструктор класса.
@@ -252,6 +463,57 @@ class TargetColumnBorders
     public TargetColumnBorders()
     {
 
+    }
+}
+
+/**
+ * Класс, представляющий логику для получения координат ячеек с днями.
+ */
+class DayColumnCoordinates
+{
+    /**
+     * Поле, содержащее адрес ячейки.
+     */
+    public CellAddress Coordinates;
+
+    /**
+     * Поле, содержащее значение дня, находящееся в данной ячейке.
+     */
+    public Days CurrentDay;
+
+    /**
+     * Конструктор класса.
+     *
+     * @param x Координата 'x' нужной ячейки.
+     * @param y Координата 'y' нужной ячейки.
+     * @param day День, содержащийся в указанной ячейке.
+     */
+    public DayColumnCoordinates(Integer x, Integer y, Days day)
+    {
+        Coordinates = new CellAddress(y, x);
+        CurrentDay = day;
+    }
+
+    /**
+     * Метод для получения адреса ячейки с указанным днем.
+     *
+     * @param day Значение ячейки, по которой нужно получить адрес.
+     * @param coordinates Список "DayColumnCoordinates", содержащий все координаты.
+     *
+     * @return Адрес нужной ячейки.
+     */
+    public static CellAddress getAddressByDay(Days day, ArrayList<DayColumnCoordinates> coordinates)
+    {
+        for (DayColumnCoordinates coordinate : coordinates)
+        {
+            if (day.equals(coordinate.CurrentDay))
+            {
+                return coordinate.Coordinates;
+            }
+        }
+
+        //Если мы дошли сюда, значит поиск ничего не нашел.
+        return null;
     }
 }
 

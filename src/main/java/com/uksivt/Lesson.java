@@ -5,26 +5,29 @@ package com.uksivt;
  */
 public class Lesson
 {
+    //region Область: Поля.
     /**
      * Внутреннее поле, содержащее номер пары.
      */
-    private final Integer number;
+    private Integer number;
 
     /**
      * Внутреннее поле, содержащее название предмета.
      */
-    private final String name;
+    private String name;
 
     /**
      * Внутреннее поле, содержащее имя преподавателя.
      */
-    private final String teacher;
+    private String teacher;
 
     /**
      * Внутреннее поле, содержащее название кабинета, где будет пара.
      */
-    private final String place;
+    private String place;
+    //endregion
 
+    //region Область: Get-Свойства.
     /**
      * Метод для получения значения поля "name".
      *
@@ -64,6 +67,58 @@ public class Lesson
     {
         return place;
     }
+    //endregion
+
+    //region Область: Set-Свойства.
+    /**
+     * Метод для установки значения свойства "number".
+     *
+     * @param number Новое значение свойства.
+     */
+    public void setNumber(Integer number)
+    {
+        this.number = number;
+    }
+
+    /**
+     * Метод для установки значения свойства "name".
+     *
+     * @param name Новое значение свойства.
+     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    /**
+     * Метод для установки значения свойства "teacher".
+     *
+     * @param teacher Новое значение свойства.
+     */
+    public void setTeacher(String teacher)
+    {
+        this.teacher = teacher;
+    }
+
+    /**
+     * Метод для установки значения свойства "place".
+     *
+     * @param place Новое значение свойства.
+     */
+    public void setPlace(String place)
+    {
+        this.place = place;
+    }
+    //endregion
+
+    //region Область: Конструкторы класса.
+    /**
+     * Конструктор класса по умолчанию.
+     */
+    public Lesson()
+    {
+
+    }
 
     /**
      * Конструктор класса.
@@ -79,4 +134,5 @@ public class Lesson
         this.teacher = teacher;
         this.place = place;
     }
+    //endregion
 }

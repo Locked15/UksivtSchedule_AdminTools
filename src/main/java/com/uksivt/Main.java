@@ -18,12 +18,15 @@ public class Main
      */
     public static void main(String[] args)
     {
-        System.out.println("Начало.\n");
-
-        System.out.println("Динамического считывания расписания не будет.");
-        System.out.println("Спасибо глупой разметке файлов и багам Apache POI за это.");
-
         DataReader reader = new DataReader();
+        ArrayList<String> groups = reader.getGroups();
+
+        System.out.println("Список групп:");
+
+        for (String group : groups)
+        {
+            System.out.println(group);
+        }
 
         try
         {
@@ -32,7 +35,7 @@ public class Main
 
         catch (Exception e)
         {
-
+            System.out.println(e.getMessage());
         }
 
         System.out.println("\nКонец.");
@@ -41,8 +44,10 @@ public class Main
     /**
      * Метод для ручного внесения данных.
      * Содержит шаблон для заполнения, что упрощает и ускоряет этот долгий и скучный процесс.
+     * <br>
+     * Также установлено подавление орфографии, ибо имена считаются ошибками.
      */
-    @SuppressWarnings("WriteOnlyObject")
+    @SuppressWarnings({ "WriteOnlyObject", "SpellCheckingInspection" })
     public static void extractedInsert()
     {
         WeekSchedule web1 = new WeekSchedule();
