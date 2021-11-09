@@ -74,13 +74,44 @@ enum Days
     //endregion
 
     /**
+     * Метод для получения дня по указанному индексу.
+     *
+     * @param i Индекс по которому нужно получить значение.
+     *
+     * @return Значение, соответствующее данному индексу.
+     *
+     * @throws IndexOutOfBoundsException Введенный индекс превышает количество значений.
+     */
+    public static Days getValueByIndex(Integer i) throws IndexOutOfBoundsException
+    {
+        return switch (i)
+        {
+            case 0 -> Monday;
+
+            case 1 -> Tuesday;
+
+            case 2 -> Wednesday;
+
+            case 3 -> Thursday;
+
+            case 4 -> Friday;
+
+            case 5 -> Saturday;
+
+            case 6 -> Sunday;
+
+            default -> throw new IndexOutOfBoundsException("Введен слишком большой индекс.");
+        };
+    }
+
+    /**
      * Метод для преобразования Enum-значения в строковый вид.
      *
      * @param day Элемент перечисления Enum.
      *
      * @return Строковое представление перечисления.
      */
-    public String toString(Days day)
+    public static String toString(Days day)
     {
         String newDay = "";
 
@@ -111,7 +142,7 @@ enum Days
      *
      * @return Строковое представление перечисления.
      */
-    public Days fromString(String day)
+    public static Days fromString(String day)
     {
         day = translateToOriginalLanguage(day);
 
@@ -142,7 +173,7 @@ enum Days
      *
      * @return День недели на английском.
      */
-    public String translateToOriginalLanguage(String day)
+    public static String translateToOriginalLanguage(String day)
     {
         day = day.toLowerCase(Locale.ROOT);
 
@@ -162,7 +193,7 @@ enum Days
 
             case "воскресенье" -> "Sunday";
 
-            default -> "Something Wrong...";
+            default -> day;
         };
     }
 
@@ -173,7 +204,7 @@ enum Days
      *
      * @return День недели на русском.
      */
-    public String translateToRussianLanguage(String day)
+    public static String translateToRussianLanguage(String day)
     {
         return switch (day)
         {
@@ -191,7 +222,7 @@ enum Days
 
             case "Sunday" -> "Воскресенье";
 
-            default -> "Something Wrong...";
+            default -> day;
         };
     }
 }
