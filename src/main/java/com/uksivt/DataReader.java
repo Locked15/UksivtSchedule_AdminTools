@@ -165,11 +165,13 @@ public class DataReader
                     Row currentRow = rows.next();
                     Iterator<Cell> cells = currentRow.cellIterator();
 
+                    //Пропускаем область с заголовком.
                     if (currentRow.getRowNum() < daysIndices.get(0).Coordinates.getRow())
                     {
                         continue;
                     }
 
+                    //Условие для смены текущего дня.
                     if (currentRow.getRowNum() == DayColumnCoordinates.getAddressByDay(Days.getValueByIndex(i), daysIndices).getRow())
                     {
                         if (i > 0)
@@ -190,9 +192,15 @@ public class DataReader
 
                         currentLesson.setNumber(lessonNumber);
 
+                        //Так как "Условие для смены номера пары" НЕ выполняется, если ...
+                        //... пары следующего дня идут с утра, то и значение переменной не сбрасывается, ...
+                        //... так что мы сбрасываем его вручную:
+                        lessonNameIsAdded = false;
+
                         i++;
                     }
 
+                    //Условие для смены номера пары.
                     if (firstCycleIterator != 0 && firstCycleIterator % 4 == 0)
                     {
                         lessons.add(currentLesson);
@@ -205,15 +213,18 @@ public class DataReader
                         currentLesson.setNumber(lessonNumber);
                     }
 
+                    //Итерируем конкретные ячейки:
                     while (cells.hasNext())
                     {
                         Cell currentCell = cells.next();
 
+                        //Пропускаем первые ячейки:
                         if (indices.get(column).LeftBorderIndex >= currentCell.getColumnIndex())
                         {
                             continue;
                         }
 
+                        //Прерываем цикл, когда итератор выходит за пределы ячеек с расписанием:
                         else if (indices.get(column).RightBorderIndex <= currentCell.getColumnIndex())
                         {
                             break;
@@ -224,6 +235,7 @@ public class DataReader
                         try
                         {
                             String cellValue = currentCell.getStringCellValue();
+                            CellAddress curCell = currentCell.getAddress();
 
                             if (!cellValue.equals(EMPTY_CELL_VALUE) && !cellValue.equals(UNITED_CELL_VALUE))
                             {

@@ -30,7 +30,9 @@ public class Main
 
         try
         {
-            reader.getWeekSchedule("19П-5");
+            var schedule = reader.getWeekSchedule("19ВЕБ-2");
+
+            System.out.println("Here i am.");
         }
 
         catch (Exception e)
