@@ -1,25 +1,31 @@
 package com.uksivt;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.io.FileInputStream;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.NoSuchElementException;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xwpf.usermodel.*;
 
 /**
  * Класс, предоставляющий логику для получения данных из Excel-файла.
  */
 public class DataReader
 {
+    //region Область: Поля работы с документами.
     /**
      * Внутреннее поле, содержащее объект, нужный для работы с xlsx-файлом.
      */
     private XSSFWorkbook workbook;
 
+    /**
+     * Внутреннее поле, содержащее объект, нужный для работы с docx-файлом.
+     */
+    private XWPFDocument document;
+    //endregion
+
+    //region Область: Константы.
     /**
      * Внутренняя константа, содержащая путь к файлу с расписанием.
      */
@@ -37,15 +43,31 @@ public class DataReader
     private static final String UNITED_CELL_VALUE;
 
     /**
+     * Внутренняя константа, содержащая путь к файлу с заменами.
+     */
+    private static final String PATH_TO_CHANGING_FILE;
+
+    /**
+     * Внутренняя константа, содержащая значение пустой ячейки таблицы Word.
+     * <br>
+     * В отличие от Excel, пустые ячейки в Word действительно пустые.
+     */
+    private static final String WORD_TABLE_EMPTY_CELL_VALUE;
+    //endregion
+
+    //region Область: Конструкторы класса.
+    /**
      * Конструктор класса.
      */
     public DataReader()
     {
         try
         {
-            FileInputStream stream = new FileInputStream(PATH_TO_FILE);
+            FileInputStream excelDocument = new FileInputStream(PATH_TO_FILE);
+            FileInputStream wordDocument = new FileInputStream(PATH_TO_CHANGING_FILE);
 
-            workbook = new XSSFWorkbook(stream);
+            workbook = new XSSFWorkbook(excelDocument);
+            document = new XWPFDocument(wordDocument);
         }
 
         catch (Exception ex)
@@ -61,15 +83,25 @@ public class DataReader
         PATH_TO_FILE = "C:\\Users\\Земфира\\Desktop\\Prog.xlsx";
         //endregion
 
+        //region Инициализация константы "PATH_TO_CHANGING_FILE":
+        PATH_TO_CHANGING_FILE = "C:\\Users\\Земфира\\Desktop\\Prog.docx";
+        //endregion
+
         //region Инициализация константы "EMPTY_CELL_VALUE":
         EMPTY_CELL_VALUE = " ".repeat(29);
+        //endregion
+
+        //region Инициализация константы "WORD_TABLE_EMPTY_CELL_VALUE":
+        WORD_TABLE_EMPTY_CELL_VALUE = "";
         //endregion
 
         //region Инициализация константы "UNITED_CELL_VALUE":
         UNITED_CELL_VALUE = "";
         //endregion
     }
+    //endregion
 
+    //region Область: Обработка документа Excel.
     /**
      * Метод для получения списка групп.
      *
@@ -113,8 +145,8 @@ public class DataReader
      *
      * @return Расписание на неделю для указанной группы.
      *
-     * @exception GroupDoesNotExistException Ошибка, возникающая при отсутствии указанной группы в расписании.
-     * @exception NullPointerException Ошибка выполнения связанная с указанием на "null".
+     * @throws GroupDoesNotExistException Ошибка, возникающая при отсутствии указанной группы в расписании.
+     * @throws NullPointerException Ошибка выполнения связанная с указанием на "null".
      */
     public WeekSchedule getWeekSchedule(String groupName) throws NullPointerException, GroupDoesNotExistException
     {
@@ -235,7 +267,6 @@ public class DataReader
                         try
                         {
                             String cellValue = currentCell.getStringCellValue();
-                            CellAddress curCell = currentCell.getAddress();
 
                             if (!cellValue.equals(EMPTY_CELL_VALUE) && !cellValue.equals(UNITED_CELL_VALUE))
                             {
@@ -295,12 +326,215 @@ public class DataReader
 
         return toReturn;
     }
+    //endregion
 
+    //region Область: Обработка документа Word.
+    /**
+     * Метод для получения расписания на день с учетом замен.
+     *
+     * @return Расписание на день, учитывающее замены.
+     *
+     * @throws WrongDayInDocument При обработке документа обнаружилось несоответствие дней.
+     */
+    public DaySchedule getDayScheduleWithChanges(WeekSchedule schedule, Days day) throws WrongDayInDocument
+    {
+        //region Область: Переменные оригинальных значений.
+        String groupName = schedule.getGroupName();
+        DaySchedule originalSchedule = schedule.getDays().get(Days.getIndexByValue(day));
+        //endregion
+
+        //region Подобласть: Переменные для проверки групп "На Практику".
+        String onPractiseString = "";
+        StringBuilder technicalString = new StringBuilder();
+        //endregion
+
+        //region Подобласть: Переменные для составления измененного расписания.
+        Integer cellNumber;
+        String possibleNumbs;
+        Lesson currentLesson;
+        Boolean cycleStopper = false;
+        Boolean changesListen = false;
+        Boolean absoluteChanges = false;
+        ArrayList<Lesson> newLessons = new ArrayList<>(1);
+        //endregion
+
+        //region Подобласть: Список с параграфами.
+        List<XWPFParagraph> paragraphs = document.getParagraphs();
+        //endregion
+
+        //Самым последним параграфом идет имя исполнителя, поэтому его игнорируем:
+        for (int i = 0; i < paragraphs.size() - 1; i++)
+        {
+            String text;
+
+            //Пятым параграфом идет название дня и недели. Проверяем корректность:
+            if (i == 5)
+            {
+                text = paragraphs.get(i).getText().toLowerCase(Locale.ROOT);
+
+                if (!text.contains(originalSchedule.day.toString().toLowerCase(Locale.ROOT)))
+                {
+                    throw new WrongDayInDocument("День отправленного расписания и документа с заменами не совпадают.");
+                }
+            }
+
+            //Первыми идут параграфы с инициалами администрации, игнорируем:
+            else if (i > 5)
+            {
+                text = paragraphs.get(i).getText();
+
+                technicalString.append(text);
+            }
+        }
+
+        //Порой бывает так, что замен нет, а вот перераспределение кабинетов - да, ...
+        //... поэтому такой случай надо обработать:
+        if (technicalString.toString().contains("– на практике"))
+        {
+            //Однако замены "на практику" всегда идут сверху, так что их индекс всегда 0.
+            onPractiseString = Arrays.asList(technicalString.toString().split("– на практике")).get(0);
+        }
+
+        //Проверяем участие проверяемой группы на "практику":
+        if (onPractiseString.toLowerCase(Locale.ROOT).contains(groupName.toLowerCase(Locale.ROOT)))
+        {
+            return DaySchedule.getOnPractiseSchedule(originalSchedule.day);
+        }
+
+        //Если группа НЕ на практике, то начинаем проверять таблицу с заменами:
+        else
+        {
+            Iterator<XWPFTable> tables = document.getTablesIterator();
+
+            while (tables.hasNext())
+            {
+                XWPFTable currentTable = tables.next();
+                List<XWPFTableRow> rows = currentTable.getRows();
+
+                for (XWPFTableRow row : rows)
+                {
+                    cellNumber = 0;
+                    possibleNumbs = "";
+                    currentLesson = new Lesson();
+                    List<XWPFTableCell> cells = row.getTableCells();
+
+                    for (XWPFTableCell cell : cells)
+                    {
+                        String text = cell.getText();
+                        String lowerText = text.toLowerCase(Locale.ROOT);
+
+                        //Перед проведением всех остальных проверок, ...
+                        //... необходимо выполнить проверку на пустое содержимое ячейки:
+                        if (text.equals(WORD_TABLE_EMPTY_CELL_VALUE))
+                        {
+                            cellNumber++;
+
+                            continue;
+                        }
+
+                        //Если мы встретили ячейку, содержащую название ...
+                        //... нужной группы начинаем считывание замен:
+                        if (lowerText.equals(groupName.toLowerCase(Locale.ROOT)))
+                        {
+                            changesListen = true;
+
+                            //Если замены по центру, то они на весь день:
+                            absoluteChanges = cellNumber != 0;
+                        }
+
+                        //Если мы встречаем название другой группы во время чтения замен, ...
+                        //... то прерываем цикл:
+                        else if (changesListen && !lowerText.equals(groupName.toLowerCase(Locale.ROOT)) &&
+                        (cellNumber == 0 || cellNumber == 3))
+                        {
+                            cycleStopper = true;
+
+                            break;
+                        }
+
+                        //В ином случае мы продолжаем считывать замены, ...
+                        //... ориентируясь на текущий номер ячейки:
+                        else if (changesListen)
+                        {
+                            switch (cellNumber)
+                            {
+                                //Во второй ячейке находится номер пары:
+                                case 1 -> possibleNumbs = text;
+
+                                //В пятой ячейке название новой пары:
+                                case 4 -> currentLesson.setName(text);
+
+                                //В шестой - имя преподавателя:
+                                case 5 -> currentLesson.setTeacher(text);
+
+                                //В седьмой - место проведения пары:
+                                case 6 -> currentLesson.setPlace(text);
+                            }
+                        }
+
+                        cellNumber++;
+                    }
+
+                    if (changesListen && !possibleNumbs.equals(""))
+                    {
+                        newLessons.addAll(expandPossibleLessons(possibleNumbs, currentLesson));
+                    }
+
+                    //После прерывания первого цикла, прерываем и второй:
+                    if (cycleStopper)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        //После обработки документа необходимо проверить полученные результаты, ...
+        //... ведь у группы, возможно, вообще нет замен:
+        if (newLessons.isEmpty())
+        {
+            return originalSchedule;
+        }
+
+        return originalSchedule.mergeChanges(newLessons, absoluteChanges);
+    }
+
+    /**
+     * Метод, позволяющий раскрыть сокращенную запись номеров пар в полный вид.
+     *
+     * @param value Сокращенный (возможно) вид записи номеров пар.
+     * @param lesson Пара, которая должна быть проведена.
+     *
+     * @return Полный вид пар.
+     */
+    private ArrayList<Lesson> expandPossibleLessons(String value, Lesson lesson)
+    {
+        String[] splatted = value.split(",");
+        ArrayList<Lesson> toReturn = new ArrayList<>(1);
+
+        //Чтобы преобразовать строку в число необходимо избавиться от пробелов:
+        for (int i = 0; i < splatted.length; i++)
+        {
+            splatted[i] = splatted[i].replace(" ", "");
+        }
+
+        for (String s : splatted)
+        {
+            toReturn.add(new Lesson(Integer.parseInt(s), lesson.getName(), lesson.getTeacher(),
+            lesson.getPlace()));
+        }
+
+        return toReturn;
+    }
+    //endregion
+
+    //region Область: Внутренние методы.
     /**
      * Метод, нужный для получения таргетированного листа с которого будет считываться расписание.
      * Если группа не найдена, будет возвращено Null.
      *
      * @param groupName Имя группы для поиска страницы.
+     *
      * @return Таргетированная страница ЛИБО Null.
      */
     private Sheet searchTargetSheet(String groupName)
@@ -339,7 +573,8 @@ public class DataReader
      *
      * @throws NullPointerException Ошибка выполнения связанная с указанием на "null".
      */
-    private ArrayList<TargetColumnBorders> searchTargetColumns(Sheet sheet, String groupName) throws NullPointerException
+    private ArrayList<TargetColumnBorders> searchTargetColumns(Sheet sheet,
+    String groupName) throws NullPointerException
     {
         Cell previousCell;
         Integer i = 0;
@@ -395,7 +630,7 @@ public class DataReader
         if (indices.get(indices.size() - 1).RightBorderIndex == null)
         {
             //Очередное доказательство того, что "Integer" и "int" — это не одно и то же.
-            indices.get(indices.size() - 1).RightBorderIndex = (Integer)(int)header.getLastCellNum();
+            indices.get(indices.size() - 1).RightBorderIndex = (Integer) (int) header.getLastCellNum();
         }
 
         return indices;
@@ -448,6 +683,7 @@ public class DataReader
 
         return toReturn;
     }
+    //endregion
 }
 
 /**
@@ -457,14 +693,14 @@ class TargetColumnBorders
 {
     /**
      * Поле, содержащее индекс левой границы столбца.
-     *
+     * <p>
      * Индекс границы является индексом границы другого столбца, примыкающего к таргетированному.
      */
     public Integer LeftBorderIndex;
 
     /**
      * Поле, содержащее индекс правой границы столбца.
-     *
+     * <p>
      * Индекс границы является индексом границы другого столбца, примыкающего к таргетированному.
      */
     public Integer RightBorderIndex;
@@ -540,6 +776,23 @@ class GroupDoesNotExistException extends Exception
      * @param message Сообщение исключения.
      */
     public GroupDoesNotExistException(String message)
+    {
+        //Вызываем конструктор базового класса:
+        super(message);
+    }
+}
+
+/**
+ * Класс, определяющие исключение попытки обработать документ с заменами с неправильным днем.
+ */
+class WrongDayInDocument extends Exception
+{
+    /**
+     * Конструктор класса.
+     *
+     * @param message Сообщение исключения.
+     */
+    public WrongDayInDocument(String message)
     {
         //Вызываем конструктор базового класса:
         super(message);

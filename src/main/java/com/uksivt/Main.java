@@ -21,18 +21,12 @@ public class Main
         DataReader reader = new DataReader();
         ArrayList<String> groups = reader.getGroups();
 
-        System.out.println("Список групп:");
-
-        for (String group : groups)
-        {
-            System.out.println(group);
-        }
-
         try
         {
-            var schedule = reader.getWeekSchedule("19ВЕБ-2");
+            var schedule = reader.getWeekSchedule("19П-5");
+            var newSchedule = reader.getDayScheduleWithChanges(schedule, Days.Monday);
 
-            System.out.println("Here i am.");
+            System.out.println();
         }
 
         catch (Exception e)

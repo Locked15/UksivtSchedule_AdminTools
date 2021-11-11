@@ -3,7 +3,7 @@ package com.uksivt;
 /**
  * Класс, предоставляющий логику для одной пары.
  */
-public class Lesson
+public class Lesson implements Comparable<Lesson>
 {
     //region Область: Поля.
     /**
@@ -133,6 +133,33 @@ public class Lesson
         this.name = name;
         this.teacher = teacher;
         this.place = place;
+    }
+    //endregion
+
+    //region Область: Реализация интерфейса.
+    /**
+     * Метод, нужный для сравнения объектов.
+     * <br><br>
+     * Реализация интерфейса Comparable.
+     *
+     * @param o Объект для сравнения.
+     *
+     * @return Результат сравнения.
+     */
+    @Override
+    public int compareTo(Lesson o)
+    {
+        if (number > o.number)
+        {
+            return 1;
+        }
+
+        else if (number.equals(o.number))
+        {
+            return 0;
+        }
+
+        return -1;
     }
     //endregion
 }
