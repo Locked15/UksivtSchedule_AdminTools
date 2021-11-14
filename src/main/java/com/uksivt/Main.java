@@ -4,6 +4,11 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.uksivt.parser_elements.MonthChanges;
+import com.uksivt.schedule_elements.DaySchedule;
+import com.uksivt.schedule_elements.Days;
+import com.uksivt.schedule_elements.Lesson;
+import com.uksivt.schedule_elements.WeekSchedule;
 
 
 /**
@@ -17,6 +22,22 @@ public class Main
      * @param args Аргументы сценария.
      */
     public static void main(String[] args)
+    {
+        DataGetter getter = new DataGetter();
+        var values = getter.getAvailableNodes();
+
+        for (MonthChanges change : values)
+        {
+            System.out.println(change);
+        }
+
+        System.out.println("\nКонец.");
+    }
+
+    /**
+     * Метод для вывода информации из считанных файлов с расписанием и заменами.
+     */
+    private static void getDocumentParseInformation()
     {
         DataReader reader = new DataReader();
         ArrayList<String> groups = reader.getGroups();
@@ -43,7 +64,8 @@ public class Main
      * <br>
      * Также установлено подавление орфографии, ибо имена считаются ошибками.
      */
-    @SuppressWarnings({ "WriteOnlyObject", "SpellCheckingInspection" })
+    @SuppressWarnings({ "WriteOnlyObject",
+    "SpellCheckingInspection" })
     public static void extractedInsert()
     {
         WeekSchedule web1 = new WeekSchedule();

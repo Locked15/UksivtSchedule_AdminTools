@@ -1,4 +1,4 @@
-package com.uksivt;
+package com.uksivt.schedule_elements;
 
 /**
  * Класс, предоставляющий логику для одной пары.

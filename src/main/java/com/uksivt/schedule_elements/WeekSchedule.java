@@ -1,4 +1,4 @@
-package com.uksivt;
+package com.uksivt.schedule_elements;
 
 import java.util.ArrayList;
 

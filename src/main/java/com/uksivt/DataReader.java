@@ -3,6 +3,10 @@ package com.uksivt;
 import java.util.*;
 import java.io.FileInputStream;
 
+import com.uksivt.schedule_elements.DaySchedule;
+import com.uksivt.schedule_elements.Days;
+import com.uksivt.schedule_elements.Lesson;
+import com.uksivt.schedule_elements.WeekSchedule;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
