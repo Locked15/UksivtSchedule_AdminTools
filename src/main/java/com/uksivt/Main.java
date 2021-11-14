@@ -1,14 +1,13 @@
 package com.uksivt;
 
-import java.io.FileWriter;
-import java.util.ArrayList;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.uksivt.parser_elements.MonthChanges;
 import com.uksivt.schedule_elements.DaySchedule;
 import com.uksivt.schedule_elements.Days;
 import com.uksivt.schedule_elements.Lesson;
 import com.uksivt.schedule_elements.WeekSchedule;
+
+import java.io.FileWriter;
+import java.util.ArrayList;
 
 
 /**
@@ -23,15 +22,7 @@ public class Main
      */
     public static void main(String[] args)
     {
-        DataGetter getter = new DataGetter();
-        var values = getter.getAvailableNodes();
-
-        for (MonthChanges change : values)
-        {
-            System.out.println(change);
-        }
-
-        System.out.println("\nКонец.");
+        //TODO: Доделать скачивание файлов с сайта через шаблон и ID.
     }
 
     /**
