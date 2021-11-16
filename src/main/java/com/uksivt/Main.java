@@ -1,6 +1,7 @@
 package com.uksivt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.uksivt.data_reader.DataReader;
 import com.uksivt.schedule_elements.DaySchedule;
 import com.uksivt.schedule_elements.Days;
 import com.uksivt.schedule_elements.Lesson;
@@ -22,7 +23,7 @@ public class Main
      */
     public static void main(String[] args)
     {
-        //TODO: Доделать скачивание файлов с сайта через шаблон и ID.
+        //TODO: Пора переходить к реализации самих клиентов на PC и Android.
     }
 
     /**
@@ -30,7 +31,8 @@ public class Main
      */
     private static void getDocumentParseInformation()
     {
-        DataReader reader = new DataReader();
+        DataReader reader = new DataReader("C:\\Users\\Земфира\\Desktop\\Prog.xlsx",
+        "C:\\Users\\Земфира\\Desktop\\ProgSec.docx");
         ArrayList<String> groups = reader.getGroups();
 
         try
@@ -55,7 +57,8 @@ public class Main
      * <br>
      * Также установлено подавление орфографии, ибо имена считаются ошибками.
      */
-    @SuppressWarnings({ "WriteOnlyObject",
+    @SuppressWarnings({
+    "WriteOnlyObject",
     "SpellCheckingInspection" })
     public static void extractedInsert()
     {

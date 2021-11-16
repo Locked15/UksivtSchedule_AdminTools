@@ -1,16 +1,18 @@
-package com.uksivt;
-
-import java.util.*;
-import java.io.FileInputStream;
+package com.uksivt.data_reader;
 
 import com.uksivt.schedule_elements.DaySchedule;
 import com.uksivt.schedule_elements.Days;
 import com.uksivt.schedule_elements.Lesson;
 import com.uksivt.schedule_elements.WeekSchedule;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xwpf.usermodel.*;
+
+import java.io.FileInputStream;
+import java.util.*;
 
 /**
  * Класс, предоставляющий логику для получения данных из Excel-файла.
@@ -31,11 +33,6 @@ public class DataReader
 
     //region Область: Константы.
     /**
-     * Внутренняя константа, содержащая путь к файлу с расписанием.
-     */
-    private static final String PATH_TO_FILE;
-
-    /**
      * Внутренняя константа, содержащая значение якобы "пустой" ячейки.
      * На самом деле в таких ячейках содержится 29 пробелов.
      */
@@ -47,11 +44,6 @@ public class DataReader
     private static final String UNITED_CELL_VALUE;
 
     /**
-     * Внутренняя константа, содержащая путь к файлу с заменами.
-     */
-    private static final String PATH_TO_CHANGING_FILE;
-
-    /**
      * Внутренняя константа, содержащая значение пустой ячейки таблицы Word.
      * <br>
      * В отличие от Excel, пустые ячейки в Word действительно пустые.
@@ -60,15 +52,16 @@ public class DataReader
     //endregion
 
     //region Область: Конструкторы класса.
+
     /**
      * Конструктор класса.
      */
-    public DataReader()
+    public DataReader(String pathToFile, String pathToChangingFile)
     {
         try
         {
-            FileInputStream excelDocument = new FileInputStream(PATH_TO_FILE);
-            FileInputStream wordDocument = new FileInputStream(PATH_TO_CHANGING_FILE);
+            FileInputStream excelDocument = new FileInputStream(pathToFile);
+            FileInputStream wordDocument = new FileInputStream(pathToChangingFile);
 
             workbook = new XSSFWorkbook(excelDocument);
             document = new XWPFDocument(wordDocument);
@@ -83,14 +76,6 @@ public class DataReader
     //Статический конструктор класса.
     static
     {
-        //region Инициализация константы "PATH_TO_FILE":
-        PATH_TO_FILE = "C:\\Users\\Земфира\\Desktop\\Prog.xlsx";
-        //endregion
-
-        //region Инициализация константы "PATH_TO_CHANGING_FILE":
-        PATH_TO_CHANGING_FILE = "C:\\Users\\Земфира\\Desktop\\Prog.docx";
-        //endregion
-
         //region Инициализация константы "EMPTY_CELL_VALUE":
         EMPTY_CELL_VALUE = " ".repeat(29);
         //endregion
@@ -106,6 +91,7 @@ public class DataReader
     //endregion
 
     //region Область: Обработка документа Excel.
+
     /**
      * Метод для получения списка групп.
      *
@@ -333,6 +319,7 @@ public class DataReader
     //endregion
 
     //region Область: Обработка документа Word.
+
     /**
      * Метод для получения расписания на день с учетом замен.
      *
@@ -376,7 +363,7 @@ public class DataReader
             {
                 text = paragraphs.get(i).getText().toLowerCase(Locale.ROOT);
 
-                if (!text.contains(originalSchedule.day.toString().toLowerCase(Locale.ROOT)))
+                if (!text.contains(Days.toString(day).toLowerCase(Locale.ROOT)))
                 {
                     throw new WrongDayInDocument("День отправленного расписания и документа с заменами не совпадают.");
                 }
@@ -533,6 +520,7 @@ public class DataReader
     //endregion
 
     //region Область: Внутренние методы.
+
     /**
      * Метод, нужный для получения таргетированного листа с которого будет считываться расписание.
      * Если группа не найдена, будет возвращено Null.
@@ -688,117 +676,4 @@ public class DataReader
         return toReturn;
     }
     //endregion
-}
-
-/**
- * Класс, представляющий логику для границ таргетированной колонны.
- */
-class TargetColumnBorders
-{
-    /**
-     * Поле, содержащее индекс левой границы столбца.
-     * <p>
-     * Индекс границы является индексом границы другого столбца, примыкающего к таргетированному.
-     */
-    public Integer LeftBorderIndex;
-
-    /**
-     * Поле, содержащее индекс правой границы столбца.
-     * <p>
-     * Индекс границы является индексом границы другого столбца, примыкающего к таргетированному.
-     */
-    public Integer RightBorderIndex;
-
-    /**
-     * Конструктор класса.
-     */
-    public TargetColumnBorders()
-    {
-
-    }
-}
-
-/**
- * Класс, представляющий логику для получения координат ячеек с днями.
- */
-class DayColumnCoordinates
-{
-    /**
-     * Поле, содержащее адрес ячейки.
-     */
-    public CellAddress Coordinates;
-
-    /**
-     * Поле, содержащее значение дня, находящееся в данной ячейке.
-     */
-    public Days CurrentDay;
-
-    /**
-     * Конструктор класса.
-     *
-     * @param x Координата 'x' нужной ячейки.
-     * @param y Координата 'y' нужной ячейки.
-     * @param day День, содержащийся в указанной ячейке.
-     */
-    public DayColumnCoordinates(Integer x, Integer y, Days day)
-    {
-        Coordinates = new CellAddress(y, x);
-        CurrentDay = day;
-    }
-
-    /**
-     * Метод для получения адреса ячейки с указанным днем.
-     *
-     * @param day Значение ячейки, по которой нужно получить адрес.
-     * @param coordinates Список "DayColumnCoordinates", содержащий все координаты.
-     *
-     * @return Адрес нужной ячейки.
-     */
-    public static CellAddress getAddressByDay(Days day, ArrayList<DayColumnCoordinates> coordinates)
-    {
-        for (DayColumnCoordinates coordinate : coordinates)
-        {
-            if (day.equals(coordinate.CurrentDay))
-            {
-                return coordinate.Coordinates;
-            }
-        }
-
-        //Если мы дошли сюда, значит поиск ничего не нашел.
-        return null;
-    }
-}
-
-/**
- * Класс, определяющий исключение отсутствия указанной группы.
- */
-class GroupDoesNotExistException extends Exception
-{
-    /**
-     * Конструктор класса.
-     *
-     * @param message Сообщение исключения.
-     */
-    public GroupDoesNotExistException(String message)
-    {
-        //Вызываем конструктор базового класса:
-        super(message);
-    }
-}
-
-/**
- * Класс, определяющие исключение попытки обработать документ с заменами с неправильным днем.
- */
-class WrongDayInDocument extends Exception
-{
-    /**
-     * Конструктор класса.
-     *
-     * @param message Сообщение исключения.
-     */
-    public WrongDayInDocument(String message)
-    {
-        //Вызываем конструктор базового класса:
-        super(message);
-    }
 }

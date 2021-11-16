@@ -1,23 +1,28 @@
-package com.uksivt;
+package com.uksivt.data_getter;
 
 import com.uksivt.parser_elements.ChangeElement;
 import com.uksivt.parser_elements.MonthChanges;
 import com.uksivt.schedule_elements.Days;
-import org.apache.xpath.operations.Bool;
+import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.time.Month;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Calendar;
+
 
 /**
  * Класс, нужный для получения документа для парса с официального сайта.
  */
 public class DataGetter
 {
+    //region Область: Константы.
     /**
      * Внутренняя константа, содержащая путь к HTML-тегу с заменами.
      * <br>
@@ -31,10 +36,19 @@ public class DataGetter
     private static final String NON_BREAKING_SPACE;
 
     /**
+     * Внутренняя константа, содержащая шаблон создания ссылок для скачивания документов с Google Drive.
+     */
+    private static final String GOOGLE_DRIVE_DOWNLOAD_LINK_TEMPLATE;
+    //endregion
+
+    //region Область: Поля класса.
+    /**
      * Поле, содержащее полученную веб-страницу.
      */
     private Document webPage;
+    //endregion
 
+    //region Область: Конструкторы класса.
     /**
      * Конструктор класса.
      */
@@ -62,6 +76,57 @@ public class DataGetter
         //region Подобласть: Инициализация константы "NON_BREAKING_SPACE".
         NON_BREAKING_SPACE = "\u00A0";
         //endregion
+
+        //region Подобласть: Инициализация константы "GOOGLE_DRIVE_DOWNLOAD_LINK_TEMPLATE".
+        GOOGLE_DRIVE_DOWNLOAD_LINK_TEMPLATE = "https://drive.google.com/uc?export=download&id=";
+        //endregion
+    }
+    //endregion
+
+    //region Область: Методы класса.
+    /**
+     * Метод, нужный для выделения настоящей ссылки на скачивание файла с заменами.
+     *
+     * @param linkToFile Оригинальная ссылка на документ с заменами.
+     *
+     * @return Ссылка для скачивания документа с заменами.
+     */
+    public String getDownloadableLinkToChangesFile(String linkToFile)
+    {
+        linkToFile = linkToFile.substring(0, linkToFile.lastIndexOf('/'));
+        linkToFile = linkToFile.substring(linkToFile.lastIndexOf('/') + 1);
+
+        return GOOGLE_DRIVE_DOWNLOAD_LINK_TEMPLATE + linkToFile;
+    }
+
+    /**
+     * Метод, нужный для скачивания файла с заменами в указанную директорию.
+     *
+     * @param url Ссылка на файл для скачивания.
+     * @param path Путь, куда следует скачать файл.
+     *
+     * @return Логическое значение, отвечающее за успех скачивания.
+     */
+    public Boolean downloadFileWithChanges(String url, String path)
+    {
+        try
+        {
+            FileUtils.copyURLToFile(new URL(url), new File(path));
+
+            return true;
+        }
+
+        catch (MalformedURLException urlException)
+        {
+            System.out.println("Полученный URL был некорректным:\n" + urlException.getMessage());
+        }
+
+        catch (IOException ioException)
+        {
+            System.out.println("В процессе скачивания была обнаружена ошибка:\n" + ioException.getMessage());
+        }
+
+        return false;
     }
 
     /**
@@ -76,6 +141,7 @@ public class DataGetter
     {
         //region Подобласть: Переменные считывания доступных замен.
         Integer i = 0;
+        Integer monthCounter = 0;
         String currentMonth = "Январь";
         ArrayList<ChangeElement> changes = new ArrayList<>(30);
         ArrayList<MonthChanges> monthChanges = new ArrayList<>(10);
@@ -111,7 +177,7 @@ public class DataGetter
             }
 
             //Если мы встречаем тег "table", то мы дошли до таблицы с заменами на какой-либо месяц.
-            else if (element.nodeName().equals("table"))
+            else if (element.nodeName().equals("table") && monthCounter < 2)
             {
                 //В таблице первым тегом всегда идет "<thead>", определяющий заголовок, ...
                 //... а вторым — "<tbody>", определяющий тело таблицы. Он нам и нужен.
@@ -127,12 +193,6 @@ public class DataGetter
                     if (j == 0)
                     {
                         continue;
-                    }
-
-                    //В последних двух строках также содержатся бесполезные значения.
-                    else if (j + 2 >= tableRows.size())
-                    {
-                        break;
                     }
 
                     //В иных случаях начинаем итерировать ячейки таблицы:
@@ -165,9 +225,13 @@ public class DataGetter
                         dayCounter++;
                     }
                 }
+
+                //Нет смысла считывать значения более чем с двух месяцев.
+                monthCounter++;
             }
         }
 
         return monthChanges;
     }
+    //endregion
 }

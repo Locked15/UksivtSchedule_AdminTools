@@ -1,6 +1,11 @@
 package com.uksivt.parser_elements;
 
+import com.uksivt.schedule_elements.Days;
+
+import javax.swing.event.DocumentEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+
 
 /**
  * Класс, представляющий определение замен за месяц.
@@ -86,6 +91,52 @@ public class MonthChanges
     //endregion
 
     //region Область: Методы.
+    /**
+     * Метод, выполняющий поиск по заменам текущего месяца и возвращающем день по указанному числу.
+     * <br>
+     * Если для указанного дня замены отсутствуют или недоступны, возвращает <i>"null"</i>.
+     *
+     * @param day Число месяца для поиска дня с заменами.
+     *
+     * @return Замены на указанный день.
+     */
+    public ChangeElement tryToFindElementByNumberOfDay(Integer day)
+    {
+        for (ChangeElement element : changes)
+        {
+            if (element.getDayOfMonth().equals(day) && element.haveChanges())
+            {
+                return element;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Метод, выполняющий поиск по заменам текущего месяца и возвращающем день с указанным названием дня.
+     * <br>
+     * Если такой день не найден, будет возвращен <i>"null"</i>.
+     *
+     * @param day Название дня для поиска.
+     *
+     * @return Элемент замены с указанным днем.
+     */
+    public ChangeElement tryToFindElementByNameOfDay(Days day)
+    {
+        Collections.reverse(changes);
+
+        for (ChangeElement element : changes)
+        {
+            if (element.getCurrentDay().equals(day) && element.haveChanges())
+            {
+                return element;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Метод для получения строкового представления объекта.
      *

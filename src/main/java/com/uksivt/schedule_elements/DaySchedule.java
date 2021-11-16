@@ -20,6 +20,7 @@ public class DaySchedule
     //endregion
 
     //region Область: Конструктор класса.
+
     /**
      * Конструктор класса.
      *
@@ -34,6 +35,7 @@ public class DaySchedule
     //endregion
 
     //region Область: Методы.
+
     /**
      * Метод, позволяющий слить оригинальное расписание и замены для него.
      *
@@ -123,5 +125,30 @@ public class DaySchedule
 
         return new DaySchedule(day, lessons);
     }
+
+    /**
+     * Метод, возвращающий строковое представление объекта.
+     *
+     * @return Строковое представление отправленного объекта.
+     */
+    @Override
+    public String toString()
+    {
+        StringBuilder toReturn = new StringBuilder(Days.toString(day) + ":\n" +
+        "{");
+
+        for (Lesson lesson : lessons)
+        {
+            toReturn.append("\n\t{").append("\n\t\tНомер пары: ").append(lesson.getNumber())
+            .append("\n\t\t").append("Название пары: ").append(lesson.getName()).append("\n\t\t")
+            .append("Кабинет: ").append(lesson.getPlace()).append("\n\t\t")
+            .append("Преподаватель: ").append(lesson.getTeacher()).append("\n\t}");
+        }
+
+        toReturn.append("\n}");
+
+        return toReturn.toString();
+    }
+
     //endregion
 }
