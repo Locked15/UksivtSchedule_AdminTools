@@ -121,6 +121,19 @@ public class Lesson implements Comparable<Lesson>
     }
 
     /**
+     * Конструктор класса для заполнения данных вручную при отсутствующей паре.
+     *
+     * @param number Номер пары.
+     */
+    public Lesson(Integer number)
+    {
+        this.number = number;
+        name = null;
+        teacher = null;
+        place = null;
+    }
+
+    /**
      * Конструктор класса.
      *
      * @param number Номер пары.

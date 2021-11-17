@@ -14,6 +14,7 @@ import org.apache.poi.xwpf.usermodel.*;
 import java.io.FileInputStream;
 import java.util.*;
 
+
 /**
  * Класс, предоставляющий логику для получения данных из Excel-файла.
  */
@@ -52,7 +53,6 @@ public class DataReader
     //endregion
 
     //region Область: Конструкторы класса.
-
     /**
      * Конструктор класса.
      */
@@ -91,7 +91,6 @@ public class DataReader
     //endregion
 
     //region Область: Обработка документа Excel.
-
     /**
      * Метод для получения списка групп.
      *
@@ -319,7 +318,6 @@ public class DataReader
     //endregion
 
     //region Область: Обработка документа Word.
-
     /**
      * Метод для получения расписания на день с учетом замен.
      *
@@ -401,6 +399,13 @@ public class DataReader
             {
                 XWPFTable currentTable = tables.next();
                 List<XWPFTableRow> rows = currentTable.getRows();
+
+                //Порой в документе бывает несколько таблиц (пример: замены на 17.11.2020), ...
+                //... и тогда таблица с заменами идет второй.
+                if (!tableIsCorrect(currentTable))
+                {
+                    continue;
+                }
 
                 for (XWPFTableRow row : rows)
                 {
@@ -520,7 +525,6 @@ public class DataReader
     //endregion
 
     //region Область: Внутренние методы.
-
     /**
      * Метод, нужный для получения таргетированного листа с которого будет считываться расписание.
      * Если группа не найдена, будет возвращено Null.
@@ -674,6 +678,22 @@ public class DataReader
         }
 
         return toReturn;
+    }
+
+    /**
+     * Метод, нужный для проверки таблицы на то, является ли таблица таблицей с заменами.
+     *
+     * @return Логическое значение, отвечающее за корректность таблицы.
+     */
+    private Boolean tableIsCorrect(XWPFTable table)
+    {
+        String temp = table.getText().toLowerCase(Locale.ROOT);
+
+        //В таблице, содержащей сами замены всегда есть подобные значения в её оглавлении, ...
+        //... но на всякий случай здесь есть возможность замены некоторых оглавлений:
+        return temp.contains("группа") && (temp.contains("заменяемая дисциплина") ||
+        temp.contains("заменяемый преподаватель")) && (temp.contains("заменяющая дисциплина") ||
+        temp.contains("заменяющий преподаватель")) && temp.contains("ауд");
     }
     //endregion
 }

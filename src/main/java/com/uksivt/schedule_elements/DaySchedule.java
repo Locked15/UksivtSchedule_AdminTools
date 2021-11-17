@@ -20,7 +20,6 @@ public class DaySchedule
     //endregion
 
     //region Область: Конструктор класса.
-
     /**
      * Конструктор класса.
      *
@@ -35,7 +34,6 @@ public class DaySchedule
     //endregion
 
     //region Область: Методы.
-
     /**
      * Метод, позволяющий слить оригинальное расписание и замены для него.
      *
@@ -149,6 +147,5 @@ public class DaySchedule
 
         return toReturn.toString();
     }
-
     //endregion
 }

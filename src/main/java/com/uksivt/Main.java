@@ -23,13 +23,14 @@ public class Main
      */
     public static void main(String[] args)
     {
-        //TODO: Пора переходить к реализации самих клиентов на PC и Android.
+        //TODO: Продолжить заполнение данных, начать с группы 21ПСА-3.
+        fullManualExtractedInsert();
     }
 
     /**
      * Метод для вывода информации из считанных файлов с расписанием и заменами.
      */
-    private static void getDocumentParseInformation()
+    private static void testParsers()
     {
         DataReader reader = new DataReader("C:\\Users\\Земфира\\Desktop\\Prog.xlsx",
         "C:\\Users\\Земфира\\Desktop\\ProgSec.docx");
@@ -37,9 +38,10 @@ public class Main
 
         try
         {
-            var schedule = reader.getWeekSchedule("19П-5");
-            var newSchedule = reader.getDayScheduleWithChanges(schedule, Days.Monday);
+            var schedule = reader.getWeekSchedule("19П-3");
+            var newSchedule = reader.getDayScheduleWithChanges(schedule, Days.Friday);
 
+            //Место для установки Точки Останова:
             System.out.println();
         }
 
@@ -52,57 +54,106 @@ public class Main
     }
 
     /**
+     * Метод для полуручного внесения данных о расписании групп в файлы.
+     * <br>
+     * Подходит для всех групп, кроме 1 курса и уКСК.
+     *
+     * @param reader Экземпляр класса "DataReader" для сканирования документа с расписанием.
+     */
+    private static void semiManualExtractedInsert(DataReader reader)
+    {
+        try
+        {
+            WeekSchedule schedule = reader.getWeekSchedule("19П-5");
+
+            writeToFile(schedule, "19P-5");
+        }
+
+        catch (Exception ex)
+        {
+            System.out.println("\nПри добавлении произошла ошибка:\n"+ ex.getMessage());
+        }
+    }
+
+    /**
      * Метод для ручного внесения данных.
      * Содержит шаблон для заполнения, что упрощает и ускоряет этот долгий и скучный процесс.
      * <br>
      * Также установлено подавление орфографии, ибо имена считаются ошибками.
      */
-    @SuppressWarnings({
-    "WriteOnlyObject",
-    "SpellCheckingInspection" })
-    public static void extractedInsert()
+    @SuppressWarnings({ "SpellCheckingInspection" })
+    private static void fullManualExtractedInsert()
     {
         WeekSchedule web1 = new WeekSchedule();
-        web1.setGroupName("21ВЕБ-1");
+        web1.setGroupName("21ПСА-2");
 
-        ArrayList<Lesson> monLessons = new ArrayList<>(1);
-        monLessons.add(new Lesson(3, "Информатика", "Васильева А. А.", "117"));
-        monLessons.add(new Lesson(4, "Физика", "Нагаев Р. А.", "336"));
-        monLessons.add(new Lesson(5, "Ин. Яз. (1 Группа)", "Нуриева А. М.", "336"));
-        monLessons.add(new Lesson(5, "Лит-Ра (2 Группа)", "Бокарева С. Ф.", "336"));
-        monLessons.add(new Lesson(6, "Химия", "Гареева С. Т.", "336"));
+        ArrayList<Lesson> monLesson = new ArrayList<>(7);
+        monLesson.add(new Lesson(0));
+        monLesson.add(new Lesson(1));
+        monLesson.add(new Lesson(2, "Математика", null, "Чз общежитие"));
+        monLesson.add(new Lesson(3, "Русский", "Мустакимова И. М.", "Чз общежитие"));
+        monLesson.add(new Lesson(4, "Информатика", "Мусина Г. А.", "Чз общежитие"));
+        monLesson.add(new Lesson(5, "Общество", "Исмагилова Г. М.", "Чз общежитие"));
+        monLesson.add(new Lesson(6));
 
-        ArrayList<Lesson> secLessons = new ArrayList<>(1);
-        secLessons.add(new Lesson(1, "Баш. Яз.", "Хисамутдинова Р. М.", "334"));
-        secLessons.add(new Lesson(2, "Общество", "Ахметшина Е. В.", "334"));
-        secLessons.add(new Lesson(3, "Математика", "Гущина М. В.", "334"));
+        ArrayList<Lesson> secLesson = new ArrayList<>(7);
+        secLesson.add(new Lesson(0));
+        secLesson.add(new Lesson(1));
+        secLesson.add(new Lesson(2, "Ин. Яз.", "Вачаева М. В.", "Чз общежитие"));
+        secLesson.add(new Lesson(3, "Баш. Яз.", "Мухамедьянова Г. М.", "Чз общежитие"));
+        secLesson.add(new Lesson(4, "Экономика", "Засыпкин К. Н.", "Чз общежитие"));
+        secLesson.add(new Lesson(5, "Математика", null,"Чз общежитие"));
+        secLesson.add(new Lesson(6));
 
-        ArrayList<Lesson> thiLessons = new ArrayList<>(1);
-        thiLessons.add(new Lesson(0, "Русский", "Бокарева С. Ф.", "327"));
-        thiLessons.add(new Lesson(1, "Математика", "Гущина М. В.", "327"));
-        thiLessons.add(new Lesson(2, "География", "[ПУСТО]", "327"));
+        ArrayList<Lesson> thiLesson = new ArrayList<>(7);
+        thiLesson.add(new Lesson(0));
+        thiLesson.add(new Lesson(1));
+        thiLesson.add(new Lesson(2));
+        thiLesson.add(new Lesson(3, "Лит-Ра (1 Группа)", "Мустакимова И. М.", "Чз общежитие"));
+        thiLesson.add(new Lesson(4, "История", "Салихов Г. Г.", "Чз общежитие"));
+        thiLesson.add(new Lesson(5, "География", "Юнусова Л. Р.", "Чз общежитие"));
+        thiLesson.add(new Lesson(6));
 
-        ArrayList<Lesson> fouLesson = new ArrayList<>(1);
-        fouLesson.add(new Lesson(0, "Математика", "Гущина М. В.", "327"));
-        fouLesson.add(new Lesson(1, "Физ-Ра", "", ""));
+        ArrayList<Lesson> fouLesson = new ArrayList<>(7);
+        fouLesson.add(new Lesson(0));
+        fouLesson.add(new Lesson(1));
+        fouLesson.add(new Lesson(2, "Астрономия", null, "Чз общежитие"));
+        fouLesson.add(new Lesson(3, "Право", "Исхакова С. И.", "Чз общежитие"));
+        fouLesson.add(new Lesson(4, "Ин. Яз. (2 Группа)", "Вачаева М. В.", "Чз общежитие"));
+        fouLesson.add(new Lesson(5));
+        fouLesson.add(new Lesson(6));
 
-        ArrayList<Lesson> fifLesson = new ArrayList<>(5);
-        fifLesson.add(new Lesson(2, "Физика", "Нагаев Р. А.", ""));
-        fifLesson.add(new Lesson(3, "ОБЖ", "Ин. Яз.", ""));
-        fifLesson.add(new Lesson(4, "Ин. Яз.", "Нуриева А. М.", ""));
-        fifLesson.add(new Lesson(5, "История (1 Группа)", "Акъюлов А. С.", ""));
-        fifLesson.add(new Lesson(5, "Физ-Ра (2 Группа)", "", ""));
+        ArrayList<Lesson> fifLesson = new ArrayList<>(7);
+        fifLesson.add(new Lesson(0));
+        fifLesson.add(new Lesson(1));
+        fifLesson.add(new Lesson(2, "Математика", null, "Чз общежитие"));
+        fifLesson.add(new Lesson(3, "Физ-Ра", "Гильманов Р. А.", null));
+        fifLesson.add(new Lesson(4, "История", "Салихов Г. Г.", "Чз общежитие"));
+        fifLesson.add(new Lesson(5));
+        fifLesson.add(new Lesson(6));
 
-        ArrayList<Lesson> sixLesson = new ArrayList<>(2);
-        sixLesson.add(new Lesson(0, "Лит-Ра", "Бокарева С. Ф.", "334"));
-        sixLesson.add(new Lesson(1, "История", "Акъюлов А. С.", "334"));
+        ArrayList<Lesson> sixLesson = new ArrayList<>(7);
+        sixLesson.add(new Lesson(0));
+        sixLesson.add(new Lesson(1));
+        sixLesson.add(new Lesson(2, "ОБЖ", null, "Чз общежитие"));
+        sixLesson.add(new Lesson(3, "Лит-Ра", "Мустакимова И. М.", "Чз общежитие"));
+        sixLesson.add(new Lesson(4, "Физ-Ра (1 Группа)", "Гильманов Р. А.", null));
+        sixLesson.add(new Lesson(5));
+        sixLesson.add(new Lesson(6));
 
-        ArrayList<Lesson> sevLesson = new ArrayList<>(1);
+        ArrayList<Lesson> sevLesson = new ArrayList<>(7);
+        sevLesson.add(new Lesson(0));
+        sevLesson.add(new Lesson(1));
+        sevLesson.add(new Lesson(2));
+        sevLesson.add(new Lesson(3));
+        sevLesson.add(new Lesson(4));
+        sevLesson.add(new Lesson(5));
+        sevLesson.add(new Lesson(6));
 
         ArrayList<DaySchedule> days = new ArrayList<>(7);
-        days.add(new DaySchedule(Days.Monday, monLessons));
-        days.add(new DaySchedule(Days.Tuesday, secLessons));
-        days.add(new DaySchedule(Days.Wednesday, thiLessons));
+        days.add(new DaySchedule(Days.Monday, monLesson));
+        days.add(new DaySchedule(Days.Tuesday, secLesson));
+        days.add(new DaySchedule(Days.Wednesday, thiLesson));
         days.add(new DaySchedule(Days.Thursday, fouLesson));
         days.add(new DaySchedule(Days.Friday, fifLesson));
         days.add(new DaySchedule(Days.Saturday, sixLesson));
@@ -110,12 +161,23 @@ public class Main
 
         web1.setDays(days);
 
+        writeToFile(web1, "21PSA-2.json");
+    }
+
+    /**
+     * Внутренний метод для записи полученных значений в файл.
+     *
+     * @param schedule Расписание, которое следует записать.
+     * @param fileName Название файла, куда будет записано расписание.
+     */
+    private static void writeToFile(WeekSchedule schedule, String fileName)
+    {
         try
         {
             ObjectMapper serializer = new ObjectMapper();
-            String serialized = serializer.writerWithDefaultPrettyPrinter().writeValueAsString(days);
+            String serialized = serializer.writerWithDefaultPrettyPrinter().writeValueAsString(schedule);
 
-            FileWriter stream = new FileWriter("D:\\Java-Projects\\ExcelDataReader\\src\\main\\resources\\General\\WEB\\21WEB-1.json");
+            FileWriter stream = new FileWriter("D:\\Java-Projects\\ExcelDataReader\\src\\main\\resources\\General\\PSA\\" + fileName);
             stream.write(serialized);
             stream.close();
         }
