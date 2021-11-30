@@ -28,32 +28,6 @@ public class Main
     }
 
     /**
-     * Метод для вывода информации из считанных файлов с расписанием и заменами.
-     */
-    private static void testParsers()
-    {
-        DataReader reader = new DataReader("C:\\Users\\Земфира\\Desktop\\Prog.xlsx",
-        "C:\\Users\\Земфира\\Desktop\\ProgSec.docx");
-        ArrayList<String> groups = reader.getGroups();
-
-        try
-        {
-            var schedule = reader.getWeekSchedule("19П-3");
-            var newSchedule = reader.getDayScheduleWithChanges(schedule, Days.Friday);
-
-            //Место для установки Точки Останова:
-            System.out.println();
-        }
-
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        System.out.println("\nКонец.");
-    }
-
-    /**
      * Метод для полуручного внесения данных о расписании групп в файлы.
      * <br>
      * Подходит для всех групп, кроме 1 курса и уКСК.

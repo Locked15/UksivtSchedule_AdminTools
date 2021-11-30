@@ -2,7 +2,6 @@ package com.uksivt.parser_elements;
 
 import com.uksivt.schedule_elements.Days;
 
-import javax.swing.event.DocumentEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 
