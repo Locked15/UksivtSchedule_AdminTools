@@ -19,24 +19,24 @@
       "place" : null
     }, {
       "number" : 3,
-      "name" : "УП 0102",
-      "teacher" : "Каюмов С.А.",
-      "place" : "229"
+      "name" : "Числ методы",
+      "teacher" : "Лахмуткина Т.Г.",
+      "place" : "218"
     }, {
       "number" : 4,
-      "name" : "СП",
-      "teacher" : "Каюмов С.А.",
-      "place" : "229"
+      "name" : "МДК 0101",
+      "teacher" : "Лахмуткина Т.Г.",
+      "place" : "218"
     }, {
       "number" : 5,
-      "name" : "ТВИМС",
-      "teacher" : "Бакирова А.Ю.",
-      "place" : "327"
+      "name" : "МДК 0101",
+      "teacher" : "Лахмуткина Т.Г.",
+      "place" : "218"
     }, {
       "number" : 6,
-      "name" : "Дискретная математика",
-      "teacher" : "Бакирова А.Ю.",
-      "place" : "327"
+      "name" : "МДК 0101",
+      "teacher" : "Лахмуткина Т.Г.",
+      "place" : "218"
     } ]
   }, {
     "day" : "Tuesday",
@@ -47,29 +47,29 @@
       "place" : null
     }, {
       "number" : 1,
-      "name" : null,
-      "teacher" : null,
-      "place" : null
+      "name" : "КС",
+      "teacher" : "Лепеева Д.И.",
+      "place" : "235"
     }, {
       "number" : 2,
-      "name" : null,
-      "teacher" : null,
-      "place" : null
+      "name" : "Дискр математика",
+      "teacher" : "Бакирова А Ю",
+      "place" : "235"
     }, {
       "number" : 3,
+      "name" : "КС",
+      "teacher" : "Лепеева Д.И.",
+      "place" : "235"
+    }, {
+      "number" : 4,
       "name" : null,
       "teacher" : null,
       "place" : null
     }, {
-      "number" : 4,
-      "name" : "КС",
-      "teacher" : "Лепеева Д.И.",
-      "place" : "235"
-    }, {
       "number" : 5,
-      "name" : "КС",
-      "teacher" : "Лепеева Д.И.",
-      "place" : "235"
+      "name" : null,
+      "teacher" : null,
+      "place" : null
     }, {
       "number" : 6,
       "name" : null,
@@ -80,29 +80,29 @@
     "day" : "Wednesday",
     "lessons" : [ {
       "number" : 0,
-      "name" : "УП 0101",
-      "teacher" : "Храмов Л.А.",
-      "place" : "5"
-    }, {
-      "number" : 1,
-      "name" : "УП 0101",
-      "teacher" : "Храмов Л.А.",
-      "place" : "5"
-    }, {
-      "number" : 2,
-      "name" : "МДК 0101",
-      "teacher" : "Храмов Л.А.",
-      "place" : "5"
-    }, {
-      "number" : 3,
-      "name" : "МДК 0101",
-      "teacher" : "Храмов Л.А.",
-      "place" : "5"
-    }, {
-      "number" : 4,
       "name" : null,
       "teacher" : null,
       "place" : null
+    }, {
+      "number" : 1,
+      "name" : null,
+      "teacher" : null,
+      "place" : null
+    }, {
+      "number" : 2,
+      "name" : "ТВИМС",
+      "teacher" : "Бакирова А.Ю.",
+      "place" : "229"
+    }, {
+      "number" : 3,
+      "name" : "УП 0102",
+      "teacher" : "Каюмов С.А.",
+      "place" : "229"
+    }, {
+      "number" : 4,
+      "name" : "СП",
+      "teacher" : "Каюмов С.А.",
+      "place" : "229"
     }, {
       "number" : 5,
       "name" : null,
@@ -118,34 +118,34 @@
     "day" : "Thursday",
     "lessons" : [ {
       "number" : 0,
-      "name" : "Ин.яз",
-      "teacher" : "Валеева З.М.",
-      "place" : "320"
+      "name" : null,
+      "teacher" : null,
+      "place" : null
     }, {
       "number" : 1,
-      "name" : "Числ методы",
-      "teacher" : "Лахмуткина Т.Г.",
-      "place" : "218"
+      "name" : null,
+      "teacher" : null,
+      "place" : null
     }, {
       "number" : 2,
       "name" : "МДК 0101",
-      "teacher" : "Храмов Л.А.",
-      "place" : "5"
+      "teacher" : "Лахмуткина Т.Г.",
+      "place" : "218"
     }, {
       "number" : 3,
       "name" : "МДК 0101",
-      "teacher" : "Храмов Л.А.",
-      "place" : "5"
+      "teacher" : "Лахмуткина Т.Г.",
+      "place" : "218"
     }, {
       "number" : 4,
-      "name" : null,
-      "teacher" : null,
+      "name" : "Физ-ра",
+      "teacher" : "Баранов А.В.",
       "place" : null
     }, {
       "number" : 5,
-      "name" : null,
-      "teacher" : null,
-      "place" : null
+      "name" : "Ин.яз",
+      "teacher" : "Валеева З.М.",
+      "place" : "320"
     }, {
       "number" : 6,
       "name" : null,
@@ -156,19 +156,19 @@
     "day" : "Friday",
     "lessons" : [ {
       "number" : 0,
-      "name" : "Физ-ра",
-      "teacher" : "Баранов А.В.",
-      "place" : null
-    }, {
-      "number" : 1,
-      "name" : "МДК 0101",
-      "teacher" : "Храмов Л.А",
-      "place" : "5"
-    }, {
-      "number" : 2,
       "name" : null,
       "teacher" : null,
       "place" : null
+    }, {
+      "number" : 1,
+      "name" : "УП 0101",
+      "teacher" : "Стюкова Я Д",
+      "place" : "217"
+    }, {
+      "number" : 2,
+      "name" : "УП 0101",
+      "teacher" : "Стюкова Я Д",
+      "place" : "217"
     }, {
       "number" : 3,
       "name" : null,
@@ -209,24 +209,24 @@
       "place" : null
     }, {
       "number" : 3,
-      "name" : "СП",
-      "teacher" : "Каюмов С.А.",
-      "place" : "229"
+      "name" : null,
+      "teacher" : null,
+      "place" : null
     }, {
       "number" : 4,
+      "name" : null,
+      "teacher" : null,
+      "place" : null
+    }, {
+      "number" : 5,
       "name" : "СП",
       "teacher" : "Каюмов С.А.",
       "place" : "229"
     }, {
-      "number" : 5,
-      "name" : null,
-      "teacher" : null,
-      "place" : null
-    }, {
       "number" : 6,
-      "name" : null,
-      "teacher" : null,
-      "place" : null
+      "name" : "СП",
+      "teacher" : "Каюмов С.А.",
+      "place" : "229"
     } ]
   } ]
 }
