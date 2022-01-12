@@ -55,6 +55,26 @@ public class DataReader
     //region Область: Конструкторы класса.
     /**
      * Конструктор класса.
+     *
+     * @param pathToFile Путь к файлу с расписанием.
+     */
+    public DataReader(String pathToFile)
+    {
+        try
+        {
+            FileInputStream excelDocument = new FileInputStream(pathToFile);
+
+            workbook = new XSSFWorkbook(excelDocument);
+        }
+
+        catch (Exception ex)
+        {
+            ex.fillInStackTrace();
+        }
+    }
+
+    /**
+     * Конструктор класса.
      */
     public DataReader(String pathToFile, String pathToChangingFile)
     {
