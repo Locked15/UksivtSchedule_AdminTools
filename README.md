@@ -95,5 +95,5 @@ All documents will indent and prettified, to more ergonomic human use (like chec
 
 ## Authors
 
-Created by Locked15 to '*Uksivt Schedule*' system. \
+Created by [Locked15](https://github.com/Locked15) to '*Uksivt Schedule*' system. \
 2021 — 2022.
