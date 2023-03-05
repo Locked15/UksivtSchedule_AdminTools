@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ExcelDataReader.iml" filepath="$PROJECT_DIR$/ExcelDataReader.iml" />
+      <module fileurl="file://$PROJECT_DIR$/UksivtScheduler_AdminTools.iml" filepath="$PROJECT_DIR$/UksivtScheduler_AdminTools.iml" />
     </modules>
   </component>
 </project>

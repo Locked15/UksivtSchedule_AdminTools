@@ -358,13 +358,13 @@ public class DataReader
         //endregion
 
         //region Подобласть: Переменные для составления измененного расписания.
-        Integer cellNumber;
-        String possibleNumbs;
-        Lesson currentLesson;
-        Boolean cycleStopper = false;
-        Boolean changesListen = false;
-        Boolean absoluteChanges = false;
-        ArrayList<Lesson> newLessons = new ArrayList<>(1);
+        Integer cellNumber; // To inner cycle model.
+        String possibleNumbs; // To inner cycle model.
+        Lesson currentLesson; // To inner cycle model.
+        Boolean cycleStopper = false; // To outer cycle model.
+        Boolean changesListen = false; // To outer cycle model.
+        Boolean absoluteChanges = false; // Replace with "Changes" class.
+        ArrayList<Lesson> newLessons = new ArrayList<>(1); // Replace with "Changes" class.
         //endregion
 
         //region Подобласть: Список с параграфами.
